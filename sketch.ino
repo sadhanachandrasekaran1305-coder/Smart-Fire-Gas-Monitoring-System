@@ -1,10 +1,11 @@
  #include <DHT.h>
-
 #define DHTPIN 4
 #define DHTTYPE DHT22
 
 #define BUZZER 18
 #define SMOKE_PIN 34
+
+#define SMOKE_THRESHOLD 2000
 
 DHT dht(DHTPIN, DHTTYPE);
 
@@ -20,8 +21,8 @@ void setup() {
 }
 
 void loop() {
-  float temperature = dht.readTemperature();
-  float humidity = dht.readHumidity();
+  float temperature = 150;
+  float humidity = 120;
 
   int smokeValue = analogRead(SMOKE_PIN);
 
@@ -30,7 +31,16 @@ void loop() {
     delay(2000);
     return;
   }
+  /*
+  if (temperature < -40 || temperature > 80 ||
+    humidity < 0 || humidity > 100) {
 
+  Serial.println("Invalid Sensor Reading!");
+  digitalWrite(BUZZER, LOW);
+  delay(2000);
+  return;
+}
+*/
   Serial.print("Temperature: ");
   Serial.print(temperature);
   Serial.print(" °C  ");
@@ -42,13 +52,12 @@ void loop() {
   Serial.print("Smoke Value: ");
   Serial.println(smokeValue);
 
-  // Smoke threshold
-  if (smokeValue > 2000) {
-    Serial.println("⚠️ ALERT! Smoke Detected!");
+ 
+  if (smokeValue > SMOKE_THRESHOLD) {
+    Serial.println("ALERT! Smoke Detected!");
     digitalWrite(BUZZER, HIGH);
   } else {
     digitalWrite(BUZZER, LOW);
   }
-
   delay(2000);
 }
